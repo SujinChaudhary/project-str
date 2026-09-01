@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { emailRegex, passwordRegex } from "../../constants/regex.js";
 
 export const registerSchema = z.object({
   name: z
@@ -6,14 +7,18 @@ export const registerSchema = z.object({
     .trim()
     .min(2, "Name must be at least 2 characters")
     .max(50, "Name cannot exceed 50 characters"),
-  email: z.email("Please provide a valid email").trim(),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+
+  email:z.email({error:(email)=> email.input ? "Invalid email address" : "Email is required" }).trim().check(z.minLength(6),z.maxLength(100),z.regex(emailRegex)),
+
+  password:z.string({error:"Password is required"}).trim().check(z.minLength(6),z.maxLength(100),z.regex(passwordRegex,{error:"Password must container upper,lower,special symbol and must be greater than 6 character"})),
+
   role: z.array(z.string()).optional(),
 });
 
 export const loginSchema = z.object({
-  email: z.email("Please provide a valid email").trim(),
-  password: z.string().min(1, "Password is required"),
+  email:z.email({error:(email)=> email.input ? "Invalid email address" : "Email is required" }).trim().check(z.minLength(6),z.maxLength(100),z.regex(emailRegex)),
+
+  password:z.string({error:"Password is required"}).trim().check(z.minLength(6),z.maxLength(100),z.regex(passwordRegex,{error:"Password must container upper,lower,special symbol and must be greater than 6 character"})),
 });
 
 export const refreshTokenSchema = z.object({
