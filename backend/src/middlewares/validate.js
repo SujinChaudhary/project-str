@@ -1,15 +1,15 @@
-import { AppError } from "../utils/AppError.js";
+import z,{ ZodError } from "zod";
 
 const validate = (schema) => (req, res, next) => {
-  const result = schema.safeParse(req.body);
-
-  if (!result.success) {
-    const message = result.error.issues.map((i) => i.message).join(", ");
-    return next(new AppError(message, 400));
+  try {
+    schema.parse(req.body);
+    next();
+  } catch (error) {
+    if(error instanceof ZodError){
+      const formattedError = z.flattenError(error)
+      res.status(400).json({message:formattedError});
+    }
   }
-
-  req.body = result.data;
-  next();
 };
 
 export default validate;

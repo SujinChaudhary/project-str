@@ -1,7 +1,7 @@
-import jwt from "jsonwebtoken";
+import { ROLE_ADMIN, ROLE_CUSTOMER, ROLE_VENDOR } from "../constants/roles.js";
 import User from "../models/User.js";
+import ApiResponse from "../utils/ApiResponse.js";
 import { verifyAccessToken } from "../utils/jwt.js";
-import asyncHandler from "../utils/asyncHandler.js";
 
 const protect = async (req, res, next) => {
   try {
@@ -15,10 +15,7 @@ const protect = async (req, res, next) => {
     }
 
     if (!token) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized, no token",
-      });
+      return res.status(401).json(new ApiResponse(401,"Not authorized, no token"));
     }
 
     const decoded = verifyAccessToken(token);
@@ -26,52 +23,37 @@ const protect = async (req, res, next) => {
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Not authorized, user not found",
-      });
+      return res.status(401).json(new ApiResponse(401,"Not authorized, user not found"));
     }
 
     req.user = user;
     next();
   } catch (error) {
-    return res.status(401).json({
-      success: false,
-      message: "Not authorized, token failed",
-    });
+    return res.status(401).json(new ApiResponse(401,"Not authorized, token failed"));
   }
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.user && req.user.role.includes("ADMIN")) {
+  if (req.user && req.user.role.includes(ROLE_ADMIN)) {
     next();
   } else {
-    return res.status(403).json({
-      success: false,
-      message: "Not authorized as admin",
-    });
+    return res.status(403).json(new ApiResponse(403,"Not authorized as admin"));
   }
 };
 
 const isVendor = (req, res, next) => {
-  if (req.user && req.user.role.includes("VENDOR")) {
+  if (req.user && req.user.role.includes(ROLE_VENDOR)) {
     next();
   } else {
-    return res.status(403).json({
-      success: false,
-      message: "Not authorized as vendor",
-    });
+    return res.status(403).json(new ApiResponse(403,"Not authorized as vendor"));
   }
 };
 
 const isCustomer = (req, res, next) => {
-  if (req.user && req.user.role.includes("CUSTOMER")) {
+  if (req.user && req.user.role.includes(ROLE_CUSTOMER)) {
     next();
   } else {
-    return res.status(403).json({
-      success: false,
-      message: "Not authorized as customer",
-    });
+    return res.status(403).json(new ApiResponse(403,"Not authorized as customer"));
   }
 };
 

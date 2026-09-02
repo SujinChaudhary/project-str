@@ -8,7 +8,7 @@ const categorySchema = new mongoose.Schema(
       trim: true,
       unique: true,
     },
-    description: {
+    managedBy: {
       type: String,
       trim: true,
       default: "",
