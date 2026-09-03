@@ -1,14 +1,16 @@
 import Category from "../models/Category.js";
 import { AppError } from "../utils/AppError.js";
 
-const createCategory = async ({ name, managedBy, status }) => {
-  const existingCategory = await Category.findOne({ name });
+const createCategory = async (data,adminId) => {
+  const existingCategory = await Category.findOne(data);
 
   if (existingCategory) {
     throw new AppError("Category with this name already exists.", 409);
   }
 
-  const category = await Category.create({ name, managedBy, status });
+
+  const category = await Category.create({...data,managedBy:adminId});
+  
   return category;
 };
 

@@ -9,9 +9,9 @@ const categorySchema = new mongoose.Schema(
       unique: true,
     },
     managedBy: {
-      type: String,
-      trim: true,
-      default: "",
+      type: mongoose.Schema.ObjectId,
+      ref:"User",
+      required:true
     },
     status: {
       type: String,

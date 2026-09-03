@@ -3,7 +3,7 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 const createCategory = asyncHandler(async (req, res) => {
-  const category = await categoryService.createCategory(req.body);
+  const category = await categoryService.createCategory(req.body,req.user._id);
 
   return res.status(201).json(new ApiResponse(201, "Category created successfully", category));
 });
