@@ -1,4 +1,4 @@
-import categoryService from "../services/category.service.js";
+import categoryService from "../services/category.services.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiResponse from "../utils/ApiResponse.js";
 

@@ -5,7 +5,7 @@ import {
   createCategorySchema,
   updateCategorySchema,
 } from "../libs/schemas/category.schema.js";
-import categoryController from "../controllers/category.controller.js";
+import categoryController from "../controllers/category.controllers.js";
 
 const router = Router();
 

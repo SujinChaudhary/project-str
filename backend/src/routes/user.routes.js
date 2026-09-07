@@ -2,7 +2,7 @@ import { Router } from "express";
 import authMiddleware from "../middlewares/authenticate.js";
 import validate from "../middlewares/validate.js";
 import validateObjectId from "../middlewares/validateObjectId.js";
-import userController from "../controllers/user.controller.js";
+import userController from "../controllers/user.controllers.js";
 import {
   updateProfileSchema,
   updateUserByAdminSchema,
