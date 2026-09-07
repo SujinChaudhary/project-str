@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(logger);
 
 // testing route
-app.get("/",(req,res)=>{
-  res.send("server running successfully!")
-})
+app.get("/", (req, res) => {
+  res.send("server running successfully!");
+});
 
 // all routes here
 app.use("/api/auth", authRoutes);
@@ -32,6 +32,6 @@ app.use("/api/categories", categoryRoutes);
 // error handler
 app.use(errorHandler);
 
-app.listen(config.port,()=>{
-  console.log(`Server running successfully on port ${config.port}`)
-})
+app.listen(config.port, () => {
+  console.log(`Server running successfully on port ${config.port}`);
+});

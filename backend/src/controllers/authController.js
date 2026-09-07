@@ -5,7 +5,9 @@ import ApiResponse from "../utils/ApiResponse.js";
 const register = asyncHandler(async (req, res) => {
   const result = await authService.register(req.body);
 
-  return res.status(201).json(new ApiResponse(201, "User registered successfully", result));
+  return res
+    .status(201)
+    .json(new ApiResponse(201, "User registered successfully", result));
 });
 
 const login = asyncHandler(async (req, res) => {
@@ -17,7 +19,9 @@ const login = asyncHandler(async (req, res) => {
 const refreshToken = asyncHandler(async (req, res) => {
   const result = await authService.refreshToken(req.body);
 
-  return res.status(200).json(new ApiResponse(200, "Token refreshed successfully", result));
+  return res
+    .status(200)
+    .json(new ApiResponse(200, "Token refreshed successfully", result));
 });
 
 export default {

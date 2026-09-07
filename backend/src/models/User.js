@@ -21,13 +21,20 @@ const userSchema = new mongoose.Schema(
       required: true,
       select: false,
     },
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     role: {
       type: [String],
-      enum: [ROLE_ADMIN,ROLE_VENDOR,ROLE_CUSTOMER],
+      enum: [ROLE_ADMIN, ROLE_VENDOR, ROLE_CUSTOMER],
       default: [ROLE_CUSTOMER],
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 userSchema.pre("save", async function () {
