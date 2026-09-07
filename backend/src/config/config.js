@@ -11,6 +11,12 @@ const config = {
   jwt_expires_in: process.env.JWT_EXPIRES_IN || "15m",
   jwt_refresh_secret: process.env.JWT_REFRESH_SECRET,
   jwt_refresh_expires_in: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
+  cloudinary:{
+    cloudinaryName:process.env.CLOUDINARY_CLOUD_NAME || " ",
+    cloudinaryApiKey:process.env.CLOUDINARY_API_KEY || " ",
+    cloudinaryApiSecret:process.env.CLOUDINARY_API_SECRET || " "
+  },
+  geminiApiKey:process.env.GEMINI_API_KEY || " "
 }
 
 export default config;
