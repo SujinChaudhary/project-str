@@ -16,6 +16,13 @@ import categoryRoutes from './routes/category.routes.js';
 import productRoutes from './routes/product.routes.js';
 import productVariantRoutes from './routes/productVariant.routes.js';
 
+import orderRoutes from "./routes/order.routes.js";
+
+// Register models so Mongoose resolves populate() references at startup
+import "./models/User.js";
+import "./models/Product.js";
+import "./models/ShippingAddress.js";
+
 const app = express();
 
 const upload = multer({storage:multer.memoryStorage(),limits:{fileSize:5000000}}) // 5mb
