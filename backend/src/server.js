@@ -1,8 +1,8 @@
-import express from 'express';
-import config from './config/config.js';
-import databaseConnection from './config/db.js';
-import connectCloudinary from './config/cloudinary.js';
-import multer from 'multer';
+import express from "express";
+import config from "./config/config.js";
+import databaseConnection from "./config/db.js";
+import connectCloudinary from "./config/cloudinary.js";
+import multer from "multer";
 
 // middlewares
 import errorHandler from './middlewares/errorHandler.js';
@@ -60,3 +60,4 @@ app.use(errorHandler);
 app.listen(config.port, () => {
     console.log(`Server running successfully on port ${config.port}`);
 });
+export default app;
