@@ -8,11 +8,11 @@ const router = express.Router();
 
 router.get("/", authenticate.protect, authenticate.isAdmin, orderControllers.getAllOrders);
 
+router.post("/", authenticate.protect, authenticate.isCustomer, validate(orderSchema), orderControllers.createOrder);
+
 router.get("/users", authenticate.protect, authenticate.isCustomer ,orderControllers.getAllOrdersByUser);
 
 router.get("/:id", authenticate.protect, orderControllers.getOrderById);
-
-router.post("/", authenticate.protect, authenticate.isCustomer, validate(orderSchema), orderControllers.createOrder);
 
 router.patch("/:id/cancel", authenticate.protect, orderControllers.cancelOrder);
 

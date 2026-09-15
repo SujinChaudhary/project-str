@@ -47,43 +47,36 @@ const register = async ({ name, email, password, phone }) => {
 };
 
 const login = async ({ email, phone, password }) => {
-  try {
-    const user = await User.findOne({
-      $or: [{ email }, { phone }],
-    }).select("+password");
+  const query = email ? { email } : { phone };
 
-    if (!user) {
-      throw new AppError("Invalid email/phone or password.", 401);
-    }
+  const user = await User.findOne(query).select("+password");
 
-    const isPasswordValid = await user.comparePassword(password);
-
-    if (!isPasswordValid) {
-      throw new AppError("Invalid email/phone or password.", 401);
-    }
-
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-
-    return {
-      accessToken,
-      refreshToken,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        role: user.role,
-      },
-    };
-  } catch (error) {
-    if (error instanceof AppError) {
-      throw error;
-    }
-
-    throw new AppError("Login failed. Please try again.", 500);
+  if (!user) {
+    throw new AppError("Invalid email/phone or password.", 401);
   }
+
+  const isPasswordValid = await user.comparePassword(password);
+
+  if (!isPasswordValid) {
+    throw new AppError("Invalid email/phone or password.", 401);
+  }
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+
+  return {
+    accessToken,
+    refreshToken,
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+    },
+  };
 };
+
 
 const refreshToken = async ({ refreshToken: token }) => {
   let decoded;

@@ -26,7 +26,7 @@ const orderItemSchema = z.object({
 const orderSchema = z.object({
     orderItems: z.array(orderItemSchema).min(1),
     totalPrice: z.number(),
-    shippingAddress: z.string().optional(),
+    shippingAddress: z.string({ error: "Shipping address ID is required" }),
 });
 
 export { orderSchema, orderStatusSchema };

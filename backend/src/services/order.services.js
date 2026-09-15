@@ -1,6 +1,5 @@
 import Order from "../models/Order.js";
 import ShippingAddress from "../models/ShippingAddress.js";
-import User from "../models/User.js";
 import crypto from "crypto";
 
 import {
@@ -58,47 +57,21 @@ const getAllOrdersByUser = async (userId) => {
 const createOrder = async (orderData, user) => {
     const orderNumber = crypto.randomUUID();
 
-    let shippingAddressId;
+    // Validate shipping address belongs to the user
+    const address = await ShippingAddress.findOne({
+        _id: orderData.shippingAddress,
+        user: user._id,
+    });
 
-    if (orderData.shippingAddress) {
-        // User picked a specific saved address — validate it belongs to them
-        const address = await ShippingAddress.findOne({
-            _id: orderData.shippingAddress,
-            user: user._id,
-        });
-
-        if (!address) {
-            throw new AppError("Shipping address not found or does not belong to you!", 404);
-        }
-
-        shippingAddressId = address._id;
-    } else {
-        // No address picked — fall back to user's registration address
-        const fullUser = await User.findById(user._id);
-
-        if (!fullUser.registrationAddress || !fullUser.registrationAddress.city) {
-            throw new AppError("No shipping address provided and no registration address found on your account!", 400);
-        }
-
-        // Save registration address as a ShippingAddress document for this order
-        const newAddress = await ShippingAddress.create({
-            user: user._id,
-            fullName: fullUser.name,
-            phoneNumber: fullUser.phone,
-            streetAddress: fullUser.registrationAddress.streetAddress,
-            city: fullUser.registrationAddress.city,
-            state: fullUser.registrationAddress.state,
-            postalCode: fullUser.registrationAddress.postalCode,
-        });
-
-        shippingAddressId = newAddress._id;
+    if (!address) {
+        throw new AppError("Shipping address not found or does not belong to you!", 404);
     }
 
     const order = await Order.create({
         ...orderData,
         user: user._id,
         orderNumber,
-        shippingAddress: shippingAddressId,
+        shippingAddress: address._id,
     });
 
     if (!order) {

@@ -1,14 +1,21 @@
 import z, { ZodError } from "zod";
 
-const validate = (schema) => (req, res, next) => {
+const validate = (schema, source = "body") => (req, res, next) => {
   try {
-    schema.parse(req.body);
+    const parsed = schema.parse(req[source]);
+
+    if (source === "query") {
+      Object.assign(req.query, parsed);
+    } else {
+      req[source] = parsed;
+    }
     next();
   } catch (error) {
     if (error instanceof ZodError) {
       const formattedError = z.flattenError(error);
-      res.status(400).json({ message: formattedError });
+      return res.status(400).json({ message: formattedError });
     }
+    next(error);
   }
 };
 
