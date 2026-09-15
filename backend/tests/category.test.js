@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import request from "supertest";
 import express from "express";
-import authRoutes from "../src/routes/authRoutes.js";
+import authRoutes from "../src/routes/auth.routes.js";
 import categoryRoutes from "../src/routes/category.routes.js";
 import User from "../src/models/User.js";
 import Category from "../src/models/Category.js";
@@ -12,6 +12,7 @@ let mongoServer;
 let app;
 let adminToken;
 let customerToken;
+let adminId;
 
 beforeAll(async () => {
   mongoServer = await MongoMemoryServer.create();
@@ -36,32 +37,36 @@ afterEach(async () => {
 });
 
 const setupTokens = async () => {
-  await request(app)
+  const adminRes = await request(app)
     .post("/api/auth/register")
     .send({
       name: "Admin User",
       email: "admin@example.com",
-      password: "password123",
+      phone: "9861000002",
+      password: "Password@1234",
     });
+
+  adminId = adminRes.body.data.user.id;
 
   const admin = await User.findOne({ email: "admin@example.com" });
   admin.role = ["ADMIN"];
   await admin.save();
 
-  const adminRes = await request(app)
+  const loginRes = await request(app)
     .post("/api/auth/login")
     .send({
       email: "admin@example.com",
-      password: "password123",
+      password: "Password@1234",
     });
-  adminToken = adminRes.body.data.accessToken;
+  adminToken = loginRes.body.data.accessToken;
 
   const customerRes = await request(app)
     .post("/api/auth/register")
     .send({
       name: "Customer User",
       email: "customer@example.com",
-      password: "password123",
+      phone: "9861000003",
+      password: "Password@1234",
     });
   customerToken = customerRes.body.data.accessToken;
 };
@@ -76,17 +81,12 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Electronics",
-          description: "Electronic gadgets and devices",
-          status: "ACTIVE",
-        });
+        .send({ name: "Electronics", status: "ACTIVE" });
 
       expect(res.status).toBe(201);
       expect(res.body.success).toBe(true);
       expect(res.body.message).toBe("Category created successfully");
       expect(res.body.data.name).toBe("Electronics");
-      expect(res.body.data.description).toBe("Electronic gadgets and devices");
       expect(res.body.data.status).toBe("ACTIVE");
       expect(res.body.data._id).toBeDefined();
       expect(res.body.data.createdAt).toBeDefined();
@@ -97,12 +97,9 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Books",
-        });
+        .send({ name: "Books" });
 
       expect(res.status).toBe(201);
-      expect(res.body.data.description).toBe("");
       expect(res.body.data.status).toBe("ACTIVE");
     });
 
@@ -110,9 +107,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          description: "Missing name field",
-        });
+        .send({});
 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
@@ -122,10 +117,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "",
-          description: "Empty name",
-        });
+        .send({ name: "" });
 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
@@ -135,18 +127,12 @@ describe("Category CRUD", () => {
       await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Electronics",
-          description: "First one",
-        });
+        .send({ name: "Electronics" });
 
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Electronics",
-          description: "Duplicate",
-        });
+        .send({ name: "Electronics" });
 
       expect(res.status).toBe(409);
       expect(res.body.success).toBe(false);
@@ -156,10 +142,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Toys",
-          status: "PENDING",
-        });
+        .send({ name: "Toys", status: "PENDING" });
 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
@@ -169,9 +152,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .post("/api/categories")
         .set("Authorization", `Bearer ${customerToken}`)
-        .send({
-          name: "Toys",
-        });
+        .send({ name: "Toys" });
 
       expect(res.status).toBe(403);
       expect(res.body.success).toBe(false);
@@ -180,9 +161,7 @@ describe("Category CRUD", () => {
     it("should not allow unauthenticated user to create category", async () => {
       const res = await request(app)
         .post("/api/categories")
-        .send({
-          name: "Toys",
-        });
+        .send({ name: "Toys" });
 
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
@@ -192,8 +171,8 @@ describe("Category CRUD", () => {
   describe("GET /api/categories", () => {
     it("should get all categories", async () => {
       await Category.create([
-        { name: "Electronics", description: "Gadgets" },
-        { name: "Books", description: "Reading material" },
+        { name: "Electronics", managedBy: adminId },
+        { name: "Books", managedBy: adminId },
       ]);
 
       const res = await request(app).get("/api/categories");
@@ -216,7 +195,7 @@ describe("Category CRUD", () => {
     it("should get a category by id", async () => {
       const category = await Category.create({
         name: "Electronics",
-        description: "Gadgets",
+        managedBy: adminId,
       });
 
       const res = await request(app).get(`/api/categories/${category._id}`);
@@ -249,7 +228,7 @@ describe("Category CRUD", () => {
     beforeEach(async () => {
       const category = await Category.create({
         name: "Electronics",
-        description: "Gadgets",
+        managedBy: adminId,
         status: "ACTIVE",
       });
       categoryId = category._id;
@@ -259,16 +238,11 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Electronics & Gadgets",
-          description: "Updated description",
-          status: "INACTIVE",
-        });
+        .send({ name: "Electronics & Gadgets", status: "INACTIVE" });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
       expect(res.body.data.name).toBe("Electronics & Gadgets");
-      expect(res.body.data.description).toBe("Updated description");
       expect(res.body.data.status).toBe("INACTIVE");
     });
 
@@ -276,25 +250,20 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Updated Name Only",
-        });
+        .send({ name: "Updated Name Only" });
 
       expect(res.status).toBe(200);
       expect(res.body.data.name).toBe("Updated Name Only");
-      expect(res.body.data.description).toBe("Gadgets");
       expect(res.body.data.status).toBe("ACTIVE");
     });
 
     it("should not update with duplicate name", async () => {
-      await Category.create({ name: "Books" });
+      await Category.create({ name: "Books", managedBy: adminId });
 
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Books",
-        });
+        .send({ name: "Books" });
 
       expect(res.status).toBe(409);
       expect(res.body.success).toBe(false);
@@ -304,9 +273,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Electronics",
-        });
+        .send({ name: "Electronics" });
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -317,9 +284,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .put(`/api/categories/${fakeId}`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          name: "Updated",
-        });
+        .send({ name: "Updated" });
 
       expect(res.status).toBe(404);
       expect(res.body.success).toBe(false);
@@ -329,9 +294,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
         .set("Authorization", `Bearer ${adminToken}`)
-        .send({
-          status: "PENDING",
-        });
+        .send({ status: "PENDING" });
 
       expect(res.status).toBe(400);
       expect(res.body.success).toBe(false);
@@ -341,9 +304,7 @@ describe("Category CRUD", () => {
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
         .set("Authorization", `Bearer ${customerToken}`)
-        .send({
-          name: "Hacked",
-        });
+        .send({ name: "Hacked" });
 
       expect(res.status).toBe(403);
       expect(res.body.success).toBe(false);
@@ -352,9 +313,7 @@ describe("Category CRUD", () => {
     it("should not allow unauthenticated user to update category", async () => {
       const res = await request(app)
         .put(`/api/categories/${categoryId}`)
-        .send({
-          name: "Hacked",
-        });
+        .send({ name: "Hacked" });
 
       expect(res.status).toBe(401);
       expect(res.body.success).toBe(false);
@@ -367,7 +326,7 @@ describe("Category CRUD", () => {
     beforeEach(async () => {
       const category = await Category.create({
         name: "Electronics",
-        description: "Gadgets",
+        managedBy: adminId,
       });
       categoryId = category._id;
     });

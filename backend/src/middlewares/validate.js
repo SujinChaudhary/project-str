@@ -13,7 +13,7 @@ const validate = (schema, source = "body") => (req, res, next) => {
   } catch (error) {
     if (error instanceof ZodError) {
       const formattedError = z.flattenError(error);
-      return res.status(400).json({ message: formattedError });
+      res.status(400).json({ success: false, message: formattedError });
     }
     next(error);
   }

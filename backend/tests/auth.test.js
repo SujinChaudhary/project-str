@@ -2,8 +2,8 @@ import mongoose from "mongoose";
 import { MongoMemoryServer } from "mongodb-memory-server";
 import request from "supertest";
 import express from "express";
-import authRoutes from "../src/routes/authRoutes.js";
-import adminRoutes from "../src/routes/adminRoutes.js";
+import authRoutes from "../src/routes/auth.routes.js";
+import adminRoutes from "../src/routes/admin.routes.js";
 import userRoutes from "../src/routes/user.routes.js";
 import User from "../src/models/User.js";
 import errorHandler from "../src/middlewares/errorHandler.js";
@@ -41,7 +41,8 @@ describe("Authentication", () => {
         .send({
           name: "John Doe",
           email: "john@example.com",
-          password: "password123",
+          phone: "9861000001",
+          password: "Password@1234",
         });
 
       expect(res.status).toBe(201);
@@ -60,7 +61,8 @@ describe("Authentication", () => {
         .send({
           name: "John Doe",
           email: "john@example.com",
-          password: "password123",
+          phone: "9861000001",
+          password: "Password@1234",
         });
 
       const res = await request(app)
@@ -68,7 +70,8 @@ describe("Authentication", () => {
         .send({
           name: "John Doe 2",
           email: "john@example.com",
-          password: "password456",
+          phone: "9861000001",
+          password: "Password@1234",
         });
 
       expect(res.status).toBe(409);
@@ -81,6 +84,7 @@ describe("Authentication", () => {
         .send({
           name: "J",
           email: "invalid-email",
+          phone: "9861000900",
           password: "123",
         });
 
@@ -94,11 +98,12 @@ describe("Authentication", () => {
         .send({
           name: "John Doe",
           email: "john@example.com",
-          password: "password123",
+          phone: "9861000001",
+          password: "Password@1234",
         });
 
       const user = await User.findOne({ email: "john@example.com" }).select("+password");
-      expect(user.password).not.toBe("password123");
+      expect(user.password).not.toBe("Password@1234");
     });
 
     it("should assign default customer role", async () => {
@@ -107,7 +112,8 @@ describe("Authentication", () => {
         .send({
           name: "John Doe",
           email: "john@example.com",
-          password: "password123",
+          phone: "9861000001",
+          password: "Password@1234",
         });
 
       expect(res.body.data.user.role).toEqual(["CUSTOMER"]);
@@ -121,7 +127,8 @@ describe("Authentication", () => {
         .send({
           name: "John Doe",
           email: "john@example.com",
-          password: "password123",
+          phone: "9861000001",
+          password: "Password@1234",
         });
     });
 
@@ -130,7 +137,7 @@ describe("Authentication", () => {
         .post("/api/auth/login")
         .send({
           email: "john@example.com",
-          password: "password123",
+          password: "Password@1234",
         });
 
       expect(res.status).toBe(200);
@@ -145,7 +152,7 @@ describe("Authentication", () => {
         .post("/api/auth/login")
         .send({
           email: "john@example.com",
-          password: "wrongpassword",
+          password: "Wrongpass@123",
         });
 
       expect(res.status).toBe(401);
@@ -157,7 +164,7 @@ describe("Authentication", () => {
         .post("/api/auth/login")
         .send({
           email: "nonexistent@example.com",
-          password: "password123",
+          password: "Password@1234",
         });
 
       expect(res.status).toBe(401);
@@ -169,7 +176,7 @@ describe("Authentication", () => {
         .post("/api/auth/login")
         .send({
           email: "john@example.com",
-          password: "password123",
+          password: "Password@1234",
         });
 
       const token = res.body.data.accessToken;
@@ -189,7 +196,8 @@ describe("Refresh Token", () => {
       .send({
         name: "John Doe",
         email: "john@example.com",
-        password: "password123",
+          phone: "9861000001",
+        password: "Password@1234",
       });
     refreshToken = res.body.data.refreshToken;
   });
@@ -232,7 +240,8 @@ describe("Authentication Middleware", () => {
       .send({
         name: "John Doe",
         email: "john@example.com",
-        password: "password123",
+          phone: "9861000001",
+        password: "Password@1234",
       });
     token = res.body.data.accessToken;
   });
@@ -294,7 +303,8 @@ describe("Role-Based Authorization", () => {
       .send({
         name: "Admin User",
         email: "admin@example.com",
-        password: "password123",
+          phone: "9861000002",
+        password: "Password@1234",
       });
 
     const admin = await User.findOne({ email: "admin@example.com" });
@@ -305,7 +315,7 @@ describe("Role-Based Authorization", () => {
       .post("/api/auth/login")
       .send({
         email: "admin@example.com",
-        password: "password123",
+        password: "Password@1234",
       });
     adminToken = adminRes.body.data.accessToken;
 
@@ -314,7 +324,8 @@ describe("Role-Based Authorization", () => {
       .send({
         name: "Customer User",
         email: "customer@example.com",
-        password: "password123",
+          phone: "9861000003",
+        password: "Password@1234",
       });
     customerToken = customerRes.body.data.accessToken;
 
@@ -323,7 +334,8 @@ describe("Role-Based Authorization", () => {
       .send({
         name: "Vendor User",
         email: "vendor@example.com",
-        password: "password123",
+          phone: "9861000004",
+        password: "Password@1234",
       });
 
     const vendor = await User.findOne({ email: "vendor@example.com" });
@@ -334,7 +346,7 @@ describe("Role-Based Authorization", () => {
       .post("/api/auth/login")
       .send({
         email: "vendor@example.com",
-        password: "password123",
+        password: "Password@1234",
       });
     vendorToken = vendorRes.body.data.accessToken;
   });
@@ -379,7 +391,8 @@ describe("Role-Based Authorization", () => {
       .send({
         name: "Multi User",
         email: "multi@example.com",
-        password: "password123",
+          phone: "9861000005",
+        password: "Password@1234",
       });
 
     const multi = await User.findOne({ email: "multi@example.com" });
@@ -390,7 +403,7 @@ describe("Role-Based Authorization", () => {
       .post("/api/auth/login")
       .send({
         email: "multi@example.com",
-        password: "password123",
+        password: "Password@1234",
       });
     const multiToken = multiRes.body.data.accessToken;
 
