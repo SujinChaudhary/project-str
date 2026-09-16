@@ -23,6 +23,9 @@
   --color-brand-text-muted: #434843; /* Inactive nav links, input placeholder/text */
   --color-brand-accent: #735c00; /* Active-link underline, hover color, badges (e.g. cart count) */
   --color-brand-border: #c3c8c0; /* Input borders, hairlines */
+  --color-brand-bg-dark: #384b3b;
+  --color-brand-accent-gold: #ffe088;
+  --color-brand-text-footer: #c3c9c2;
 
   /* ---- Fonts ----
      Loaded via next/font/google in app/layout.jsx as CSS variables
