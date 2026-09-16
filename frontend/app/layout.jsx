@@ -1,4 +1,10 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  EB_Garamond,
+  Hanken_Grotesk,
+} from "next/font/google";
+import ReduxProvider from "@/app/providers/ReduxProvider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -11,6 +17,18 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const ebGaramond = EB_Garamond({
+  subsets: ["latin"],
+  variable: "--font-family-serif",
+  weight: ["400", "500", "700"],
+});
+
+const hankenGrotesk = Hanken_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-family-nav",
+  weight: ["400", "500", "600", "700"],
+});
+
 export const metadata = {
   title: "ShopZone",
   description: "Multi Vendor ecommerce platform",
@@ -20,9 +38,11 @@ export default function RootLayout({ children }) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${ebGaramond.variable} ${hankenGrotesk.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ReduxProvider>{children}</ReduxProvider>
+      </body>
     </html>
   );
 }
