@@ -1,0 +1,35 @@
+/*
+  ============================================================
+  BRAND TOKENS — Shop Zone
+  ============================================================
+  This is the ONE file to edit to reskin the storefront (colors
+  + fonts) without touching component code. Every value here is
+  consumed via var(--token-name) in components like Header, and
+  eventually Footer/Button/ProductCard.
+
+  To rebrand: replace the values below. Do not rename the
+  variables unless you also update every component that
+  references them (search the codebase for the token name).
+
+  Source: Figma "shop-zone" file
+  (https://www.figma.com/design/ouNdYY3c6GdLIpHuhiWfzg/shop-zone)
+  ============================================================
+*/
+
+:root {
+  /* ---- Colors ---- */
+  --color-brand-bg: #f7faf5; /* Header/Footer background */
+  --color-brand-text: #384b3b; /* Logo, active/current nav link, primary brand text */
+  --color-brand-text-muted: #434843; /* Inactive nav links, input placeholder/text */
+  --color-brand-accent: #735c00; /* Active-link underline, hover color, badges (e.g. cart count) */
+  --color-brand-border: #c3c8c0; /* Input borders, hairlines */
+
+  /* ---- Fonts ----
+     Loaded via next/font/google in app/layout.jsx as CSS variables
+     of the same name — this file just documents/declares the
+     fallback stack. To swap fonts, change both here AND the
+     next/font import in app/layout.jsx. */
+  --font-family-serif: "EB Garamond", serif; /* Logo */
+  --font-family-nav:
+    "Hanken Grotesk", sans-serif; /* Nav links, buttons, body UI */
+}

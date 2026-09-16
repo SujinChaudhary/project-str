@@ -1,5 +1,5 @@
 @import "tailwindcss";
-
+@import "./brand-token.css";
 :root {
   /* =========================
      COLORS
@@ -33,7 +33,6 @@
 
   --color-overlay: rgba(0, 0, 0, 0.5);
 
-
   /* =========================
      SPACING
   ========================= */
@@ -49,7 +48,6 @@
   --space-12: 48px;
   --space-16: 64px;
   --space-20: 80px;
-
 
   /* =========================
      TYPOGRAPHY
@@ -76,7 +74,6 @@
   --line-height-normal: 1.5;
   --line-height-relaxed: 1.75;
 
-
   /* =========================
      RADIUS
   ========================= */
@@ -88,14 +85,12 @@
   --radius-2xl: 24px;
   --radius-full: 9999px;
 
-
   /* =========================
      BORDER
   ========================= */
 
   --border-width-thin: 1px;
   --border-width-medium: 2px;
-
 
   /* =========================
      SHADOW
@@ -105,7 +100,6 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-
 
   /* =========================
      Z-INDEX
@@ -121,7 +115,6 @@
   --z-tooltip: 1600;
   --z-toast: 1700;
 
-
   /* =========================
      LAYOUT
   ========================= */
@@ -134,7 +127,6 @@
 
   --header-height: 64px;
   --sidebar-width: 260px;
-
 
   /* =========================
      COMPONENTS
@@ -153,7 +145,6 @@
   --card-padding: 24px;
   --card-radius: var(--radius-lg);
 
-
   /* =========================
      ANIMATION
   ========================= */
@@ -166,7 +157,6 @@
   --ease-out: ease-out;
   --ease-in-out: ease-in-out;
 
-
   /* =========================
      ACCESSIBILITY
   ========================= */
@@ -174,11 +164,16 @@
   --focus-width: 2px;
   --focus-offset: 2px;
 
-
   /* =========================
      OPACITY
   ========================= */
 
   --opacity-disabled: 0.5;
   --opacity-muted: 0.7;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
 }
